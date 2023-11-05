@@ -1,0 +1,57 @@
+----------
+Develop :
+----------
+
+-Exhaustive search algorithm
+-Greedy heuristics
+
+-------------------------
+Analysis for the report :
+-------------------------
+
+- Formal computacional complexity
+- Sequence of experiments :
+	- Number of basic operations
+	- Execution time
+	- Number of solutions
+
+- Compare the results of experimental and formal analysis
+- Determine the largest graph computable on my PC in reasonable time
+
+- Estimate execution time for larger problems
+- Report template, max. 8 pages
+
+---------------------------
+Graphs for the experiments:
+---------------------------
+
+- Graph vertices are 2D points on XoY plane, integer coordinates between [0,100]
+- Vertices should neither be coincident nor too close
+- Number of edges sharing a vertex is random
+
+- Generate sucessively larger graphs with 4,5,6 vertices using my student number as seed
+- Use 12.5%,25%,50%,75% of the maximum number of edges for the number of vertices
+
+-----------
+Sugestions:
+-----------
+
+- Use NetworkX package
+- Store graphs in files
+
+- Adjacency matrix/incidence matrix??
+
+- Might be useful to graphically visualize the graphs and solutions
+
+------------
+My problem :
+------------
+
+17 	- Find a minimum weight dominating set for a given undirected graph G(V, E), whose vertices
+carry positive weights, with n vertices and m edges. 
+
+	-A dominating set of G is a subset D of vertices, such that every vertex not in D is adjacent to,
+ at least, one vertex in D.
+
+	- The weight of a dominating set is the sum of its vertices’ weights. A minimum weight
+ dominating set is a dominating set whose total weight is as small as possible.

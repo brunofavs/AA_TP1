@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from tabulate import tabulate
 
-def computeDominatingSet(G,subset):
+def testDominatingSet(G,subset):
     """
     This function should take in a graph and its subset and determine if it is a dominant set
     """

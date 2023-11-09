@@ -10,7 +10,7 @@ from tabulate import tabulate
 
 from lib.randomGraphGenerators import generateRandomUndirectedGraph
 from lib.generateGraphSubsets import generateGraphSubsets
-from lib.dominatingSet import computeDominatingSet
+from lib.dominatingSet import testDominatingSet
 
 
 # Lowest weight dominating set
@@ -34,7 +34,7 @@ class LWDS:
 
     def computeDominantSets(self):
         for subset in self.graph_subsets:
-            is_dominant = computeDominatingSet(self.graph, subset)
+            is_dominant = testDominatingSet(self.graph, subset)
 
             if is_dominant:
                 self.dominant_sets.append(subset)
@@ -68,6 +68,58 @@ class LWDS:
         self.computeDominantSets()
         self.findLightestSets(self.dominant_sets)
 
+
+    def greedy(self):
+        ''' Order the nodes by the ratio neigbours/weight, choose the best until there is a dominating set'''
+        pass
+        node_list = np.asarray(self.graph.nodes)
+        weight_list = [self.graph.nodes[n]['weight'] for n in self.graph.nodes]
+        # Converting to array so that I can multiply by a scalar
+        neighbour_list = np.asarray([len(list(self.graph.neighbors(node))) for node in self.graph.nodes])
+
+        # Increasing influence of number of edges
+        neighbour_list *= 3
+
+        #* The lower the better
+        weight_neighbours_ratio = np.divide(weight_list,neighbour_list) 
+
+        print(f'Node list {node_list}')
+        print(f'Weights {weight_list}')
+        print(f'Neighbours {neighbour_list}')
+        print(f'Weight neighbour ratio is {weight_neighbours_ratio}')
+        # Ordered from smallest to largest
+        idx_ordered = np.argsort(weight_neighbours_ratio)
+        print(f'Indexes ordered {idx_ordered}')
+
+        # print(idx_ordered)
+        node_list_ordered = list(node_list[idx_ordered])
+        # print(node_list_ordered)
+
+        is_dominant = False
+        potential_dominant_set = []
+        
+        while is_dominant == False and len(node_list_ordered) != 0:
+            
+            potential_dominant_set.append(node_list_ordered.pop(0))
+
+            is_dominant = testDominatingSet(self.graph,potential_dominant_set)
+
+        # In case the while breaks because of len = 0
+        if is_dominant == True:
+            self.lightest_dominating_sets = potential_dominant_set
+
+        weights = [self.graph.nodes[node]['weight'] for node in self.lightest_dominating_sets]
+        # weights = [node for node in self.lightest_dominating_sets]
+        print(f'fewfwefew {weights}')
+        subset_weight = sum(weights)
+
+        print(f'Lightest dominant set is {self.lightest_dominating_sets}') 
+        print(f"Subset's {self.lightest_dominating_sets} weigth is {subset_weight}")
+
+
+
+
+
     def draw(self):
         # * Get the positions from the node's attributes
         pos = nx.get_node_attributes(self.graph, "pos")
@@ -98,11 +150,12 @@ def main():
     random.seed(config["rng_seed"])
     np.random.seed(config["rng_seed"])
 
-    n_nodes = 30
-    density = 1
+    n_nodes = 15
+    density = 0.2
 
     G = LWDS(n_nodes, density)
     G.bruteForceDominantSets()
+    G.greedy()
     G.draw()
 
 

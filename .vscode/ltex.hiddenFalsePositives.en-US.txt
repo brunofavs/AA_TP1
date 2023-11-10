@@ -1,0 +1,4 @@
+{"rule":"MASS_AGREEMENT","sentence":"^\\QThis algorithm design the biggest downside is obviously has the\\E$"}
+{"rule":"CONFUSION_OF_THEN_THAN","sentence":"^\\QThe intuition for this heuristic is : If a node has less weight, it's obviously better If a node has more neighbors, it has more potential to be a crucial node in a dominant set Then, with\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Qnp.argsort() is being used, which uses Quicksort by default\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qnp.argsort() is being used, which uses Quicksort by default\\E$"}

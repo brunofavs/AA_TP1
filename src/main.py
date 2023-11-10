@@ -78,7 +78,7 @@ class LWDS:
         neighbour_list = np.asarray([len(list(self.graph.neighbors(node))) for node in self.graph.nodes])
 
         # Increasing influence of number of edges
-        neighbour_list *= 3
+        neighbour_list *= 1
 
         #* The lower the better
         weight_neighbours_ratio = np.divide(weight_list,neighbour_list) 
@@ -150,8 +150,8 @@ def main():
     random.seed(config["rng_seed"])
     np.random.seed(config["rng_seed"])
 
-    n_nodes = 15
-    density = 0.2
+    n_nodes = 6
+    density = 0.4
 
     G = LWDS(n_nodes, density)
     G.bruteForceDominantSets()

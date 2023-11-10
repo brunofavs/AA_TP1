@@ -17,7 +17,7 @@ def generateRandomUndirectedGraph(num_nodes, graph_density):
             -> I dont think so, isn't it just like analysing 2 separate graphs?
 
         -Does it make sense to have isolated nodes?
-            -> No because any set containing only isolated nodes will never be a dominating set and they can be including into any other dominating set.
+            -> No because any set containing only isolated nodes will never be a dominating set and they have to be included into every dominating set.
                However, since there is no negative weights, they would only make the set's total weight bigger.
         
         -For graphs with few nodes, sometimes just assuring there is only 1 connected component already makes it denser that intended, I suppose

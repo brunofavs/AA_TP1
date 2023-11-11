@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import os
+import sys
 import numpy as np
 import math
 import random
@@ -7,6 +9,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import itertools
 from tabulate import tabulate
+import time
+import csv
 
 from lib.randomGraphGenerators import generateRandomUndirectedGraph
 from lib.generateGraphSubsets import generateGraphSubsets
@@ -68,28 +72,29 @@ class LWDS:
         self.computeDominantSets()
         self.findLightestSets(self.dominant_sets)
 
-
     def greedy(self):
-        ''' Order the nodes by the ratio neigbours/weight, choose the best until there is a dominating set'''
+        """Order the nodes by the ratio neigbours/weight, choose the best until there is a dominating set"""
         pass
         node_list = np.asarray(self.graph.nodes)
-        weight_list = [self.graph.nodes[n]['weight'] for n in self.graph.nodes]
+        weight_list = [self.graph.nodes[n]["weight"] for n in self.graph.nodes]
         # Converting to array so that I can multiply by a scalar
-        neighbour_list = np.asarray([len(list(self.graph.neighbors(node))) for node in self.graph.nodes])
+        neighbour_list = np.asarray(
+            [len(list(self.graph.neighbors(node))) for node in self.graph.nodes]
+        )
 
         # Increasing influence of number of edges
         neighbour_list *= 1
 
-        #* The lower the better
-        weight_neighbours_ratio = np.divide(weight_list,neighbour_list) 
+        # * The lower the better
+        weight_neighbours_ratio = np.divide(weight_list, neighbour_list)
 
-        print(f'Node list {node_list}')
-        print(f'Weights {weight_list}')
-        print(f'Neighbours {neighbour_list}')
-        print(f'Weight neighbour ratio is {weight_neighbours_ratio}')
+        print(f"Node list {node_list}")
+        print(f"Weights {weight_list}")
+        print(f"Neighbours {neighbour_list}")
+        print(f"Weight neighbour ratio is {weight_neighbours_ratio}")
         # Ordered from smallest to largest
         idx_ordered = np.argsort(weight_neighbours_ratio)
-        print(f'Indexes ordered {idx_ordered}')
+        print(f"Indexes ordered {idx_ordered}")
 
         # print(idx_ordered)
         node_list_ordered = list(node_list[idx_ordered])
@@ -97,28 +102,25 @@ class LWDS:
 
         is_dominant = False
         potential_dominant_set = []
-        
+
         while is_dominant == False and len(node_list_ordered) != 0:
-            
             potential_dominant_set.append(node_list_ordered.pop(0))
 
-            is_dominant = testDominatingSet(self.graph,potential_dominant_set)
+            is_dominant = testDominatingSet(self.graph, potential_dominant_set)
 
         # In case the while breaks because of len = 0
         if is_dominant == True:
             self.lightest_dominating_sets = potential_dominant_set
 
-        weights = [self.graph.nodes[node]['weight'] for node in self.lightest_dominating_sets]
+        weights = [
+            self.graph.nodes[node]["weight"] for node in self.lightest_dominating_sets
+        ]
         # weights = [node for node in self.lightest_dominating_sets]
-        print(f'fewfwefew {weights}')
+        print(f"fewfwefew {weights}")
         subset_weight = sum(weights)
 
-        print(f'Lightest dominant set is {self.lightest_dominating_sets}') 
+        print(f"Lightest dominant set is {self.lightest_dominating_sets}")
         print(f"Subset's {self.lightest_dominating_sets} weigth is {subset_weight}")
-
-
-
-
 
     def draw(self):
         # * Get the positions from the node's attributes
@@ -144,20 +146,79 @@ w: {self.graph.nodes[node]['weight']}
         )
         plt.show()
 
+# Disable
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore
+def enablePrint():
+    sys.stdout = sys.__stdout__
 
 def main():
     config = {"rng_seed": 98374}
     random.seed(config["rng_seed"])
     np.random.seed(config["rng_seed"])
 
-    n_nodes = 6
-    density = 0.4
+    #* -----------------
+    #* Single Testing
+    #* -----------------
+    # n_nodes = 8
+    # # 18 is the limit for brute force
+    # density = 0.4
 
-    G = LWDS(n_nodes, density)
-    G.bruteForceDominantSets()
-    G.greedy()
-    G.draw()
+    # G = LWDS(n_nodes, density)
 
+    # start = time.time()
+    # # G.greedy()
+    # G.bruteForceDominantSets()
+    # end = time.time()
+    # print(end - start)
+    # G.draw()
+    # exit()
+
+    #* -----------------
+    #* Batch Testing
+    #* -----------------
+    n_nodes_list = [n for n in range(4, 200)]
+    
+    densities = [0.125, 0.25, 0.5, 0.75]
+    csvs_bf_times = ["../results/bf_time_12_5.csv","../results/bf_time_25.csv","../results/bf_time_50.csv","../results/bf_time_75.csv"]
+    csvs_gh_times = ["../results/gh_time_12_5.csv","../results/gh_time_25.csv","../results/gh_time_50.csv","../results/gh_time_75.csv"]
+    csvs_n_ops= ["../results/bf_ops_12_5.csv","../results/bf_time_25.csv","../results/bf_time_50.csv","../results/bf_time_75.csv"] 
+
+    times = []
+    Gs = []
+
+    # for csv_path,density in zip(csvs_bf_times,densities):
+    for csv_path,density in zip(csvs_gh_times,densities):
+        
+        print(f'Calculating for density {density}')
+
+        Gs = []
+        times = []
+
+        blockPrint()
+        for n_nodes in n_nodes_list:
+            Gs.append(LWDS(n_nodes,density))
+
+        for G in Gs:
+            start = time.time()
+            # G.bruteForceDominantSets()
+            G.greedy()
+            end = time.time()
+
+            times.append(float(f"{end-start:.2g}"))
+        enablePrint()
+
+        print(list(zip(n_nodes_list,times)))
+        with open(csv_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+
+            # Writing header
+            writer.writerow(['Nodes', 'Time'])
+
+            # Writing data
+            writer.writerows(zip(n_nodes_list, times))
 
 if __name__ == "__main__":
     main()
